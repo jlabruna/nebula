@@ -2,7 +2,7 @@ from flask import Flask
 import os
 import psycopg2
 
-# test JL update
+# test JL update2
 
 app = Flask(__name__)
 
