@@ -6,6 +6,9 @@ import psycopg2, bcrypt
 
 app = Flask(__name__)
 
+# setting secret key used to 'sign' session values
+app.config["SECRET_KEY"] = "My secret key"
+
 @app.route('/')
 #TODO: work out how much of the below we can move to a model
 #TODO: overall vision for this page is a screenshot of the media library and prompt a sign in.
@@ -80,10 +83,10 @@ def login_action():
 
     if len(result):
         session["user_id"] = result[0][0]
-        return redirect("/right") #this is successfully logged in
+        return redirect("/") #this is successfully logged in
     
     else:
-        return redirect("/wrong") #this is not successfully logged in. maybe create a new user if not valid?
+        return redirect("/login") #this is not successfully logged in. maybe create a new user if not valid?
 
 
 @app.route("/signup")
