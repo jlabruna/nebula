@@ -95,7 +95,7 @@ def login_form():
     <input type="submit">
   </form>
   """
-@app.route("/api/login", methods=["POST"])
+@app.route("/api/login", methods=['GET', 'POST'])
 def login_action():
     connection = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = connection.cursor()
