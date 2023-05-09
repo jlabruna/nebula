@@ -56,6 +56,7 @@ def add():
 @app.route("/login")
 def login_form():
   return f"""
+  <h1>LOGIN PAGE</h1>
   <form actions="/api/login" method="POST">
     <label for="username">Username</label>
     <input id="username" type="text" name="username">
@@ -88,8 +89,9 @@ def login_action():
 @app.route("/signup")
 def signup_form():
   return f"""
+  <h1>SIGNUP PAGE</h1>
   <form action="/api/signup" method="POST">
-    
+
   <label for="username">Username</label>
     <input id="username" type="text" name="username">
 
