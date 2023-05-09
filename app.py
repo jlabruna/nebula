@@ -85,7 +85,7 @@ def add_media():
 def login_form():
   return f"""
   <h1>LOGIN PAGE</h1>
-  <form actions="/api/login" method="POST">
+  <form action="/api/login" method="POST">
     <label for="username">Username</label>
     <input id="username" type="text" name="username">
 
@@ -95,7 +95,7 @@ def login_form():
     <input type="submit">
   </form>
   """
-@app.route("/api/login", methods=['GET', 'POST'])
+@app.route("/api/login", methods=["POST"])
 def login_action():
     connection = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = connection.cursor()
