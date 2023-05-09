@@ -30,30 +30,55 @@ def index():
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
 
-@app.route('/movies')
-#shows items that are tagged movies only
-def movies():
-    pass
-
-@app.route('/games')
-#shows items that are tagged games only
-def games():
-    pass
-
-@app.route('/books')
-#shows items that are tagged books only
-def books():
-    pass
-
-@app.route('/music')
-#shows items that are tagged music only
-def music():
-    pass
 
 @app.route('/add')
 #add new item
-def add():
-    pass
+def add_form():
+  return f"""
+  <h1>ADD MEDIA</h1>
+  <form actions="/api/add" method="POST">
+    <label for="title">title</label>
+    <input id="title" type="text" name="title">
+    
+    <label for="type">Type</label>
+    <select name="type" id="type">
+        <option value="movie">Movie</option>
+        <option value="game">Game</option>
+        <option value="book">Book</option>
+        <option value="music">Music</option>
+    </select>
+
+    <label for="genre">Genre</label>
+    <input id="genre" type="text" name="genre">
+
+    <label for="summary">Summary</label>
+    <textarea id="summary" type="text" name="summary">
+
+    <label for="image">Image</label>
+    <input id="image" type="text" name="image">
+
+    <input type="submit">
+  </form>
+  """
+# title, type, genre, summary, image
+@app.route("/api/add", methods=["POST"])
+def add_media():
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = connection.cursor()
+    media_title = request.form.get("title")
+    media_type = request.form.get("type")
+    media_genre = request.form.get("genre")
+    media_summary = request.form.get("summary")
+    media_image = request.form.get("image")
+
+    cursor.execute("INSERT INTO items(title, type, genre, summary, image) VALUES(%s, %s, %s, %s, %s);", [media_title, media_type, media_genre, media_summary, media_image])
+    # TODO: commit the SQL commands
+    connection.commit()
+
+    # TODO: close the connection
+    connection.close()
+
+    # return render_template("fanx.html", food_name=food_name, food_price=food_price, food_img=food_img, food_vegan=food_vegan)
 
 
 @app.route("/login")
