@@ -18,9 +18,11 @@ def index():
     # results = cursor.fetchall()
     # connection.close()
     # return f"THIS IS A TEST {results[0]}"
-    active_user = session['user_id']
-    print(active_user)
-    return active_user
+    user_id = session.get("user_id", "")
+    if user_id:
+        return f"hello {session.get('user_id', '')}, you have access!"
+    else:
+        return f"You need to login"
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
@@ -114,3 +116,10 @@ def signup_action():
     connection.close()
 
     return redirect("/login")
+
+
+@app.route("/logout")
+def logout():
+    session["user_id"] = None
+    # or session.clear() to clear cookie completely
+    return redirect("/")
