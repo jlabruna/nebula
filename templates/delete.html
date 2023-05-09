@@ -4,27 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Untitled 4</title>
+    <title>LOCO TACOS</title>
     <link rel="stylesheet" href="/static/menu.css">
   </head>
   <body>
     <a href="/menu">Menu</a>
     <a href="/about">About</a>
     <a href="/contact">Contact</a>
-    <a href="/add">Add Media Item</a>
+    <a href="/form/food/add">Add Food</a>
     <a href="/form/food/edit">Edit Food</a>
     <a href="/form/food/delete">Delete Food</a>
     <img class="banner" src="https://static.vecteezy.com/system/resources/thumbnails/006/296/747/small/bookshelf-with-books-biography-adventure-novel-poem-fantasy-love-story-detective-art-romance-banner-for-library-book-store-genre-of-literature-illustration-in-flat-style-vector.jpg">
-    <h1>HOMESTUFF:</h1>
-    <div class="menu_items">    
-        {% for item in media_items %}
-        <h2>title = {{ item["title"] }}</h2><h4>id = {{ item["id"] }} </h4>
-        <p>type = {{ item["type"] }} </p>
-        <p>genre = {{ item["genre"] }} </p>
-        <p>summary = {{ item["summary"] }} </p>
-        <img class="media_img" src='{{ item["image"] }}'>
-      {% endfor %}
-    </div>
-</body>
+  <h1>Add Food Items Here:</h1>
+  <div class="form_items">    
+    <p>Are you sure you want to delete {{ food_item["name"] }}?</p>
+<form>
+    <input hidden name="id" value="{{ food_item['id'] }}">
+    <input type="submit" value="Yes" formmethod="POST" formaction="/api/food/delete">
+    <input type="submit" value="No" formaction="/menu">
+</form>
+
+  
+  </div>
+  </body>
 </html>
 

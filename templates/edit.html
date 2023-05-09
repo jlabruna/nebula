@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LOCO TACOS</title>
+    <link rel="stylesheet" href="/static/menu.css">
+  </head>
+  <body>
+    <a href="/menu">Menu</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+    <a href="/form/food/add">Add Food</a>
+    <a href="/form/food/edit">Edit Food</a>
+    <a href="/form/food/delete">Delete Food</a>
+    <img class="banner" src="https://static.vecteezy.com/system/resources/thumbnails/006/296/747/small/bookshelf-with-books-biography-adventure-novel-poem-fantasy-love-story-detective-art-romance-banner-for-library-book-store-genre-of-literature-illustration-in-flat-style-vector.jpg">
+  <h1>Add Food Items Here:</h1>
+  <div class="form_items">    
+    <form method="POST" action="/api/food/edit/{{ food_item['id'] }}">
+        <label for="item_name">Food Item Name:</label>
+        <input id="item_name" name="item_name" value="{{ food_item['name'] }}" required/>
+        <label for="item_price">PRice in Cents:</label>
+        <input id="item_price" name="item_price" value="{{ food_item['price'] }}" required/>
+        <label for="item_pic">Food Image URL:</label>
+        <input id="item_pic" name="item_pic" value="{{ food_item['image_url'] }}"/>
+        <label for="item_vegan">Is it Vegan?</label>
+        <input id="item_vegan" name="item_vegan" value="{{ food_item['vegan'] }}"/>
+        <input type="submit">
+    </form>
+    
+    <!-- <form action="/api/food/edit" method="post">
+      <label for="food_name">Food Item Name:</label>
+      <input type="text" id="food_name" name="food_name"><br>
+      <label for="food_price">Price in Cents:</label>
+      <input type="int" id="food_price" name="food_price"><br>
+      <label for="food_img">Food Image URL:</label>
+      <input type="text" id="food_img" name="food_img"><br>
+      <label for="food_vegan">Is it Vegan?</label>
+      <input type="bool" id="food_vegan" name="food_vegan"><br>
+      <button>Add Food Item!</button>
+  </form> -->
+  </div>
+  </body>
+</html>
+
