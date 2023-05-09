@@ -12,12 +12,15 @@ app = Flask(__name__)
 #navigation on this page is login/sign up/add new, navigation to sort by media type
 def index():
     # connection = psycopg2.connect(host=os.getenv("PGHOST"), user=os.getenv("PGUSER"), password=os.getenv("PGPASSWORD"), port=os.getenv("PGPORT"), dbname=os.getenv("PGDATABASE"))
-    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM mytable;")
-    results = cursor.fetchall()
-    connection.close()
-    return f"THIS IS A TEST {results[0]}"
+    # connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    # cursor = connection.cursor()
+    # cursor.execute("SELECT * FROM mytable;")
+    # results = cursor.fetchall()
+    # connection.close()
+    # return f"THIS IS A TEST {results[0]}"
+    active_user = session['user_id']
+    print(active_user)
+    return active_user
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
@@ -65,7 +68,7 @@ def login_form():
 def login_action():
     connection = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = connection.cursor()
-    email = request.form.get("username")
+    username = request.form.get("username")
     password = request.form.get("password")
     cursor.execute(f"SELECT id FROM users WHERE username='{username}';")
     result = cursor.fetchall()
@@ -78,4 +81,36 @@ def login_action():
     
     else:
         return redirect("/wrong") #this is not successfully logged in. maybe create a new user if not valid?
+
+
+@app.route("/signup")
+def signup_form():
+  return f"""
+  <form action="/api/signup" method="POST">
     
+  <label for="username">Username</label>
+    <input id="username" type="text" name="username">
+
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password">
+
+    <input type="submit">
+  </form>
+  """
+
+@app.route("/api/signup", methods=["POST"])
+def signup_action():
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = connection.cursor()
+    sign_name = request.form.get("username")
+    sign_pw = request.form.get("password")
+    hash_pw = bcrypt.hashpw(sign_pw.encode(), bcrypt.gensalt())
+    print(hash_pw)
+    cursor.execute("INSERT INTO users(username, password) VALUES(%s, %s);", [sign_name, hash_pw])
+    # TODO: commit the SQL commands
+    connection.commit()
+
+    # TODO: close the connection
+    connection.close()
+
+    return redirect("/login")
