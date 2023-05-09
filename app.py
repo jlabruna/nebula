@@ -31,7 +31,7 @@ def index():
 
         media_items = []
         for item in cursor.fetchall():
-            media_items.append({"id": item[0], "title": item[1], "type":item[2], "genre":item[3], "summary":item[4], "image":item[5]})
+            media_items.append({"id": item[0], "user id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
         return render_template("home.html", media_items=media_items)
 
