@@ -52,7 +52,7 @@ def add_form():
     <input id="genre" type="text" name="genre">
 
     <label for="summary">Summary</label>
-    <textarea id="summary" type="text" name="summary">
+    <textarea id="summary" type="text" name="summary"></textarea>
 
     <label for="image">Image</label>
     <input id="image" type="text" name="image">
