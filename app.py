@@ -23,9 +23,20 @@ def index():
     # return f"THIS IS A TEST {results[0]}"
     user_id = session.get("user_id", "")
     if user_id:
-        return f"hello {session.get('user_id', '')}, you have access!"
+        
+        # return f"hello {session.get('user_id', '')}, you have access!"
+        connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT * FROM items")
+
+        media_items = []
+        for item in cursor.fetchall():
+            media_items.append({"id": item[0], "title": item[1], "type":item[2], "genre":item[3], "summary":item[4], "image":item[5]})
+        connection.close()
+        return render_template("home.html", media_items=media_items)
+
     else:
-        return f"You need to login"
+        return f"Sign up or log in to view your media library!"
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
@@ -36,7 +47,7 @@ if __name__ == '__main__':
 def add_form():
   return f"""
   <h1>ADD MEDIA</h1>
-  <form actions="/api/add" method="POST">
+  <form action="/api/add" method="POST">
     <label for="title">title</label>
     <input id="title" type="text" name="title">
     
