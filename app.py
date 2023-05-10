@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, redirect, session
 import os
 import psycopg2, bcrypt
 
-# test JL update2
-
 app = Flask(__name__)
 
 # setting secret key used to 'sign' session values
@@ -14,17 +12,11 @@ app.config["SECRET_KEY"] = "My secret key"
 #TODO: overall vision for this page is a screenshot of the media library and prompt a sign in.
 #navigation on this page is login/sign up/add new, navigation to sort by media type
 def index():
-    # connection = psycopg2.connect(host=os.getenv("PGHOST"), user=os.getenv("PGUSER"), password=os.getenv("PGPASSWORD"), port=os.getenv("PGPORT"), dbname=os.getenv("PGDATABASE"))
-    # connection = psycopg2.connect(os.getenv("DATABASE_URL"))
-    # cursor = connection.cursor()
-    # cursor.execute("SELECT * FROM mytable;")
-    # results = cursor.fetchall()
-    # connection.close()
-    # return f"THIS IS A TEST {results[0]}"
-    user_id = session.get("user_id", "")
+    user_id = session.get("user_id") #pulls out these values from the session and puts them in local variables
+    username = session.get("username") #i can use this later to say "hey username!"
+
     if user_id:
-        
-        # return f"hello {session.get('user_id', '')}, you have access!"
+        cursor.execute("SELECT * FROM items WHERE userid = (%s)", ([user_id])) #we can now pull the userID out of the session and stick it in SQL. we can then pull out only hte logged in users items
         connection = psycopg2.connect(os.getenv("DATABASE_URL"))
         cursor = connection.cursor()
         cursor.execute(f"SELECT * FROM items")
@@ -33,7 +25,7 @@ def index():
         for item in cursor.fetchall():
             media_items.append({"id": item[0], "user id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
-        return render_template("home.html", media_items=media_items)
+        return render_template("home.html", media_items=media_items, username=username)
 
     else:
         return f"Sign up or log in to view your media library!"
@@ -71,7 +63,6 @@ def add_form():
     <input type="submit">
   </form>
   """
-# title, type, genre, summary, image
 @app.route("/api/add", methods=["POST"])
 def add_media():
     connection = psycopg2.connect(os.getenv("DATABASE_URL"))
@@ -83,13 +74,8 @@ def add_media():
     media_image = request.form.get("image")
 
     cursor.execute("INSERT INTO items(title, type, genre, summary, image) VALUES(%s, %s, %s, %s, %s);", [media_title, media_type, media_genre, media_summary, media_image])
-    # TODO: commit the SQL commands
     connection.commit()
-
-    # TODO: close the connection
     connection.close()
-
-    # return render_template("fanx.html", food_name=food_name, food_price=food_price, food_img=food_img, food_vegan=food_vegan)
     return redirect("/")
 
 @app.route("/login")
@@ -119,10 +105,11 @@ def login_action():
 
     if len(result):
         session["user_id"] = result[0][0]
+        session["username"] = result[0][1]
         return redirect("/") #this is successfully logged in
     
     else:
-        return redirect("/login") #this is not successfully logged in. maybe create a new user if not valid?
+        return redirect("/login") #this is not successfully logged in
 
 
 @app.route("/signup")
@@ -150,17 +137,12 @@ def signup_action():
     hash_pw = bcrypt.hashpw(sign_pw.encode(), bcrypt.gensalt())
     print(hash_pw)
     cursor.execute("INSERT INTO users(username, password) VALUES(%s, %s);", [sign_name, hash_pw])
-    # TODO: commit the SQL commands
     connection.commit()
-
-    # TODO: close the connection
     connection.close()
-
     return redirect("/login")
 
 
 @app.route("/logout")
 def logout():
-    session["user_id"] = None
-    # or session.clear() to clear cookie completely
+    session.clear() # we need to clear cookie completely because we are using username and userid now
     return redirect("/")
