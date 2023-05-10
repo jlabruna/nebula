@@ -8,9 +8,6 @@ app.config["SECRET_KEY"] = "My secret key"
 
 
 @app.route('/')
-#TODO: work out how much of the below we can move to a model
-#TODO: overall vision for this page is a screenshot of the media library and prompt a sign in.
-#navigation on this page is login/sign up/add new, navigation to sort by media type
 
 def index():
 
@@ -29,7 +26,7 @@ def index():
         for item in cursor.fetchall():
             media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
-        return render_template("home.html", media_items=media_items, username=username) # NEW: Pass the username to the template too
+        return render_template("home.html", media_items=media_items, username=username)
 
     else:
         return render_template("welcome.html") # NEW: User isn't logged in, so show a welcome template.
@@ -46,16 +43,16 @@ def list_type(type):
 
     if user_id:
         if type == None:
-            return redirect(url_for('login_error', notification="error"))
-        
-        connection = psycopg2.connect(os.getenv("DATABASE_URL"))        
-        cursor = connection.cursor()
-        cursor.execute(f"SELECT * FROM items WHERE user_id = (%s) AND type = '{type}';", ([user_id])) 
-        media_items = []
-        for item in cursor.fetchall():
-            media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
-        connection.close()
-        return render_template("home.html", media_items=media_items, username=username)
+            return redirect(url_for('index'))
+        else:
+            connection = psycopg2.connect(os.getenv("DATABASE_URL"))        
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM items WHERE user_id = (%s) AND type = '{type}';", ([user_id])) 
+            media_items = []
+            for item in cursor.fetchall():
+                media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
+            connection.close()
+            return render_template("home.html", media_items=media_items, username=username)
 
     else:
         return render_template("welcome.html") # NEW: User isn't logged in, so show a welcome template.
