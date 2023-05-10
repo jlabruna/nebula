@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="/api/add" method="POST">
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" class="form-control" placeholder="Star Wars">
+    </div>
+    <div class="form-group">
+        <label for="type">Media Type</label>
+        <select class="form-control" id="type" name="type">
+            <option value="Movie">Movie</option>
+            <option value="TV">TV Series</option>
+            <option value="Game">Game</option>
+            <option value="Book">Book</option>
+            <option value="Music">Music</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="genre">Genre</label>
+        <input id="genre" name="genre" type="text" class="form-control" placeholder="Science Fiction">
+    </div>
+    <div class="form-group">
+        <label for="image">Image</label>
+        <input id="image" name="image" type="text" class="form-control" placeholder="http://...">
+    </div>
+    <div class="form-group">
+        <label for="summary">Summary</label>
+        <textarea id="summary" name="summary" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary mb-2">Add Media</button>
+
+</form>
+{% endblock %}

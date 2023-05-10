@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="alert alert-success" role="alert">
+            Welcome back {{ print_username }}, you are now logged in. <a href="/" class="alert-link">Go to the
+                homepage</a> or <a href="/add" class="alert-link">add new media</a>.
+        </div>
+    </div>
+
+</div>
+{% endblock %}
