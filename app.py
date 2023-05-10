@@ -103,18 +103,18 @@ def login_action():
     connection = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = connection.cursor()
     username = request.form.get("username")
-    password = request.form.get("password")
-    cursor.execute(f"SELECT * FROM users WHERE username='{username}';")
-    # TODO: Compare the password!!
+    plain_text_password = request.form.get("password") #we are getting the password attempt from the form they completed
+    cursor.execute(f"SELECT * FROM users WHERE username='{username}';") #getting the username from database that matches the username
     result = cursor.fetchall()
-    print(result)
+
+    password_hash=result[0][2] #creating a new variable that just has the hashed value from the array of data for that user to compare
     connection.close()
 
-    if len(result): # Found user in DB, set a session cookie (TODO: CHECK PASSWORD BEFORE THIS!!)
-        session["user_id"] = result[0][0] # NEW: Add the user_id to the session/cookie
-        session["username"] = result[0][1] # NEW: Add the username to the session/cookie
+    if bcrypt.checkpw(plain_text_password.encode(), password_hash.encode()): #comparing the two
+        session["user_id"] = result[0][0] 
+        session["username"] = result[0][1] #if they match we are setting user_id and username
 
-        return redirect(url_for('login_error', notification="loggedin")) # NEW: Redirect to login page with success muessage
+        return redirect(url_for('index')) #Redirect to home page with success muessage
     
     else:
         return redirect(url_for('login_error', notification="error")) # NEW: Redirect to login page with fail message (this one shouldn't ever happen)
