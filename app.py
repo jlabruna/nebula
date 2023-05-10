@@ -45,6 +45,8 @@ def list_type(type):
     username = session.get("username")
 
     if user_id:
+        if type == None:
+            return redirect(url_for('login_error', notification="error"))
         
         connection = psycopg2.connect(os.getenv("DATABASE_URL"))        
         cursor = connection.cursor()
