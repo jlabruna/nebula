@@ -37,6 +37,30 @@ def index():
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
 
+@app.route('/type/<type>')
+
+def list_type(type):
+
+    user_id = session.get("user_id", "")
+    username = session.get("username")
+
+    if user_id:
+        
+        connection = psycopg2.connect(os.getenv("DATABASE_URL"))        
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT * FROM items WHERE user_id = (%s) AND type = '{type}';", ([user_id])) 
+        media_items = []
+        for item in cursor.fetchall():
+            media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
+        connection.close()
+        return render_template("home.html", media_items=media_items, username=username)
+
+    else:
+        return render_template("welcome.html") # NEW: User isn't logged in, so show a welcome template.
+
+if __name__ == '__main__':
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
+
 
 @app.route('/add')
 def add_form():
