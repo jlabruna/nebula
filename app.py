@@ -90,7 +90,7 @@ def add_media():
     connection.close()
 
     # return render_template("fanx.html", food_name=food_name, food_price=food_price, food_img=food_img, food_vegan=food_vegan)
-
+     return redirect("/")
 
 @app.route("/login")
 def login_form():
