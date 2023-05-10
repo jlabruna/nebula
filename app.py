@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for #url_for lets me redirect to a function (the url for a route) in case the 
 import os
 import psycopg2, bcrypt
 
@@ -27,7 +27,7 @@ def index():
 
         media_items = []
         for item in cursor.fetchall():
-            media_items.append({"id": item[0], "user id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
+            media_items.append({"id": item[0], "userid": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
         return render_template("home.html", media_items=media_items, username=username) # NEW: Pass the username to the template too
 
