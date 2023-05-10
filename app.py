@@ -109,15 +109,15 @@ def login_action():
 
     password_hash=result[0][2] #creating a new variable that just has the hashed value from the array of data for that user to compare
     connection.close()
-    if bcrypt.check_password_hash(password_hash, plain_text_password): # returns True
+    # if bcrypt.check_password_hash(password_hash, plain_text_password): # returns True
     # if bcrypt.checkpw(plain_text_password.encode(), password_hash.encode()): #comparing the two
-        session["user_id"] = result[0][0] 
-        session["username"] = result[0][1] #if they match we are setting user_id and username
+    session["user_id"] = result[0][0] 
+    session["username"] = result[0][1] #if they match we are setting user_id and username
 
-        return redirect(url_for('index')) #Redirect to login page with success muessage
+    return redirect(url_for('index')) #Redirect to login page with success muessage
     
-    else:
-        return redirect(url_for('login_error', notification="error")) # NEW: Redirect to login page with fail message (this one shouldn't ever happen)
+    # else:
+    #     return redirect(url_for('login_error', notification="error")) # NEW: Redirect to login page with fail message (this one shouldn't ever happen)
 
 @app.route("/api/signup", methods=["POST"])
 def signup_action():
