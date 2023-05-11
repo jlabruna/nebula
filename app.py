@@ -10,32 +10,36 @@ bcrypt = Bcrypt(app)
 app.config["SECRET_KEY"] = "My secret key"
 
 
+
 @app.route('/')
-
+#TODO: work out how much of the below we can move to a model
+#TODO: overall vision for this page is a screenshot of the media library and prompt a sign in.
+#navigation on this page is login/sign up/add new, navigation to sort by media type
+ 
 def index():
-
+ 
     # NEW: Grab their user_id and username from the session cookie
-    user_id = session.get("user_id", "")
+    user_id = session.get("user_id")
     username = session.get("username")
-
+ 
     # NEW: If user_id exists, it means they're logged in
     if user_id:
-        
-        connection = psycopg2.connect(os.getenv("DATABASE_URL"))        
+        connection = psycopg2.connect(os.getenv("DATABASE_URL"))
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM items WHERE user_id = (%s)", ([user_id])) # NEW: Only pull the logged-in-user's DB entries
-
+        cursor.execute("SELECT * FROM items WHERE userid = (%s)", ([user_id])) # NEW: Only pull the logged-in-user's DB entries
+ 
         media_items = []
         for item in cursor.fetchall():
-            media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
+            media_items.append({"id": item[0], "userid": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
-        return render_template("home.html", media_items=media_items, username=username)
-
+        return render_template("home.html", media_items=media_items, username=username) # NEW: Pass the username to the template too
+ 
     else:
         return render_template("welcome.html") # NEW: User isn't logged in, so show a welcome template.
-
+ 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
+
 
 @app.route('/type/<type>')
 
@@ -92,6 +96,99 @@ def add_media():
 
     return redirect("/") # Media has been added, redirect to homepage (TODO: with a success alert)
 
+
+@app.route('/edit/<media_id>')
+@app.route('/edit')
+def edit_form(media_id):
+ 
+    if not media_id:
+        return redirect(url_for('index'))
+ 
+    username = session.get("username") # NEW: Get their username from the session
+    user_id = session.get("user_id")
+ 
+    if username: # NEW: If a username exists, it means they're logged in
+        connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM items WHERE id = (%s)", ([media_id]))
+        media_items = cursor.fetchone()
+        connection.close()
+ 
+        media_title = media_items[2]
+        media_type = media_items[3]
+        media_genre = media_items[4]
+        media_summary = media_items[5]
+        media_image = media_items[6]
+ 
+        return render_template("edit.html", username=username, user_id=user_id, media_title=media_title, media_type=media_type, media_genre=media_genre, media_summary=media_summary, media_image=media_image, media_id=media_id)
+    else: 
+        return redirect(url_for('login_error', notification="error")) # NEW: User isn't logged in, so send them to the login page along with an error
+ 
+@app.route("/api/edit", methods=["POST"])
+def edit_media():
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = connection.cursor()
+    user_id = session.get("user_id", "") # NEW: Grab the user_id from the session and add it to any media item they submit to the DB
+    media_title = request.form.get("title")
+    media_type = request.form.get("type")
+    media_genre = request.form.get("genre")
+    media_summary = request.form.get("summary")
+    media_image = request.form.get("image")
+    media_id = request.form.get("media_id")
+ 
+    cursor.execute("UPDATE items SET (title, type, genre, summary, image) = (%s, %s, %s, %s, %s) WHERE id = %s;", [media_title, media_type, media_genre, media_summary, media_image, media_id])
+    connection.commit()
+    connection.close()
+ 
+    redirect_url = "/edit/" + media_id
+    return redirect(redirect_url) # Media has been added, redirect to homepage (TODO: with a success alert)
+ 
+ 
+@app.route('/del/<media_id>')
+@app.route('/del')
+def del_form(media_id):
+ 
+    if not media_id:
+        return redirect(url_for('index'))
+ 
+    username = session.get("username") # NEW: Get their username from the session
+    user_id = session.get("user_id")
+ 
+    if username: # NEW: If a username exists, it means they're logged in
+        
+        connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM items WHERE id = (%s)", ([media_id]))
+        media_items = cursor.fetchone()
+        connection.close()
+ 
+        media_title = media_items[2]
+        media_type = media_items[3]
+        media_genre = media_items[4]
+        media_summary = media_items[5]
+        media_image = media_items[6]
+ 
+        return render_template("del.html", media_title=media_title, media_image=media_image, media_id=media_id)
+    else: 
+        return redirect(url_for('login_error', notification="error"))
+ 
+@app.route("/api/del", methods=["POST"])
+def del_media():
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = connection.cursor()
+ 
+    user_id = session.get("user_id", "") # NEW: Grab the user_id from the session and add it to any media item they submit to the DB
+    media_title = request.form.get("title") # TODO: Use this later for a "<TITLE> was deleted!" alert.
+    media_id = request.form.get("media_id")
+ 
+    cursor.execute("DELETE FROM items WHERE id = %s;", [media_id])
+ 
+    connection.commit()
+    connection.close()
+ 
+    return redirect("/") # Media has been deleted, redirect to homepage (TODO: with a success alert)
+ 
+
 @app.route("/login") # NEW: Normal login page, now combined with signup page
 def login_form():
         return render_template("login.html")
@@ -103,7 +200,7 @@ def login_error(notification): # NEW: Pass the notification type into the functi
 
 @app.route("/api/login", methods=["POST"])
 def login_action():
-    connection = psycopg2.connect(host=database_host, user=database_user, password=database_pass, port=database_port, dbname="nebuladb")
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
     cursor = connection.cursor()
     username = request.form.get("username")
     cursor.execute("SELECT * FROM users WHERE username=%s;", [username])

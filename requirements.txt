@@ -2,4 +2,4 @@ Flask
 Gunicorn
 psycopg2
 requests
-bcrypt
+flask_bcrypt

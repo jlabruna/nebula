@@ -3,13 +3,7 @@
 
 {% block content %}
 <div class="container">
-    {% if username: %}
-    <div class="row">
-        <div class="alert alert-warning m-4" role="alert">
-            You are already logged in, <a href="/" class="alert-link">click here</a> to go to the homepage.
-        </div>
-    </div>
-    {% elif notification == "error" %}
+    {% if notification == "error" %}
     <div class="row">
         <div class="alert alert-danger m-4" role="alert">
             You need to be <a href="/login" class="alert-link">logged in</a> to use this feature.
@@ -20,6 +14,18 @@
         <div class="alert alert-success m-4" role="alert">
             You are now logged in! Go to the <a href="/" class="alert-link">homepage</a> or <a href="/add"
                 class="alert-link">add media</a>.
+        </div>
+    </div>
+    {% elif notification == "badlogin" %}
+    <div class="row">
+        <div class="alert alert-danger m-4" role="alert">
+            Username/Password not found! Please try again.
+        </div>
+    </div>
+    {% elif username: %}
+    <div class="row">
+        <div class="alert alert-warning m-4" role="alert">
+            You are already logged in, <a href="/" class="alert-link">click here</a> to go to the homepage.
         </div>
     </div>
     {% endif %}

@@ -4,32 +4,32 @@
 <form action="/api/edit" method="POST">
     <div class="form-group">
         <label for="title">Title</label>
-        <input id="title" name="title" type="text" class="form-control" placeholder="Star Wars">
+        <input id="title" name="title" type="text" class="form-control" value="{{ media_title }}">
     </div>
     <div class="form-group">
         <label for="type">Media Type</label>
         <select class="form-control" id="type" name="type">
-            <option value="Movie">Movie</option>
-            <option value="TV">TV Series</option>
-            <option value="Game">Game</option>
-            <option value="Book">Book</option>
-            <option value="Music">Music</option>
+            <option value="Movie" {% if media_type=="Movie" : %}selected{% endif %}>Movie</option>
+            <option value="TV" {% if media_type=="TV" : %}selected{% endif %}>TV Series</option>
+            <option value="Game" {% if media_type=="Game" : %}selected{% endif %}>Game</option>
+            <option value="Book" {% if media_type=="Book" : %}selected{% endif %}>Book</option>
+            <option value="Music" {% if media_type=="Music" : %}selected{% endif %}>Music</option>
         </select>
     </div>
     <div class="form-group">
         <label for="genre">Genre</label>
-        <input id="genre" name="genre" type="text" class="form-control" placeholder="Science Fiction">
+        <input id="genre" name="genre" type="text" class="form-control" value="{{ media_genre }}">
     </div>
     <div class="form-group">
         <label for="image">Image</label>
-        <input id="image" name="image" type="text" class="form-control" placeholder="http://...">
+        <input id="image" name="image" type="text" class="form-control" value="{{ media_image }}">
     </div>
     <div class="form-group">
         <label for="summary">Summary</label>
-        <textarea id="summary" name="summary" class="form-control" rows="3"></textarea>
+        <textarea id="summary" name="summary" class="form-control" rows="3">{{ media_summary }}</textarea>
     </div>
-
-    <button type="submit" class="btn btn-primary mb-2">Save Edit</button>
+    <input id="media_id" name="media_id" type="hidden" value="{{ media_id }}">
+    <button type="submit" class="btn btn-primary mb-2">Edit Media</button>
 
 </form>
 {% endblock %}
