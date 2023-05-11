@@ -7,7 +7,7 @@ from flask_bcrypt import Bcrypt #i was having problems with other bcrypt, search
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 
-app.config["SECRET_KEY"] = "My secret key"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 
 
