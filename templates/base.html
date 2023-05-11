@@ -16,11 +16,12 @@
     <div class="container mb-4">
         <div class="py-5 text-center">
             <h2>{% if username: %}{{ username }}'s{% else %}Media{% endif %} Library</h2>
+            <img class="img-fluid" src="{{ url_for('static', filename='header.jpg') }}" />
         </div>
 
         <ul class="nav justify-content-center bg-info mb-4">
             <li class="nav-item">
-                <a class="nav-link text-white" href="/">Home</a>
+                <a class="nav-link text-white" href="/">{% if username: %}{{ username }}'s{% else %}Media{% endif %} Library</a>
             </li>
             {% if username: %}
             <li class="nav-item">
