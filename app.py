@@ -26,11 +26,11 @@ def index():
     if user_id:
         connection = psycopg2.connect(os.getenv("DATABASE_URL"))
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM items WHERE userid = (%s)", ([user_id])) # NEW: Only pull the logged-in-user's DB entries
+        cursor.execute("SELECT * FROM items WHERE user_id = (%s)", ([user_id])) # NEW: Only pull the logged-in-user's DB entries
  
         media_items = []
         for item in cursor.fetchall():
-            media_items.append({"id": item[0], "userid": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
+            media_items.append({"id": item[0], "user_id": item[1], "title": item[2], "type":item[3], "genre":item[4], "summary":item[5], "image":item[6]})
         connection.close()
         return render_template("home.html", media_items=media_items, username=username) # NEW: Pass the username to the template too
  
