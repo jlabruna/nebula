@@ -15,7 +15,7 @@
 <body class="bg-light">
     <div class="container mb-4">
         <div class="py-5 text-center">
-            <h2>{{ username }}'s Library</h2>
+            <h2>{% if username: %}{{ username }}'s{% else %}Media{% endif %} Library</h2>
         </div>
 
         <ul class="nav justify-content-center bg-info">
@@ -24,19 +24,19 @@
             </li>
             {% if username: %}
             <li class="nav-item">
-                <a class="nav-link" href="/type/Movie">Movies</a>
+                <a class="nav-link text-warning" href="/type/Movie">Movies</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/type/TV">TV</a>
+                <a class="nav-link text-warning" href="/type/TV">TV</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/type/Game">Games</a>
+                <a class="nav-link text-warning" href="/type/Game">Games</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/type/Book">Books</a>
+                <a class="nav-link text-warning" href="/type/Book">Books</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/type/Music">Music</a>
+                <a class="nav-link text-warning" href="/type/Music">Music</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white" href="/add">Add Media</a>
