@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, session, url_for #url_for lets me redirect to a function (the url for a route) in case the 
 import os
-import psycopg2, bcrypt
+import psycopg2
+from flask_bcrypt import Bcrypt #i was having problems with other bcrypt, searched solution stack overflow they said use this library instead
+
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 app.config["SECRET_KEY"] = "My secret key"
 
@@ -100,22 +103,25 @@ def login_error(notification): # NEW: Pass the notification type into the functi
 
 @app.route("/api/login", methods=["POST"])
 def login_action():
-    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    connection = psycopg2.connect(host=database_host, user=database_user, password=database_pass, port=database_port, dbname="nebuladb")
     cursor = connection.cursor()
     username = request.form.get("username")
-    plain_text_password = request.form.get("password") #we are getting the password attempt from the form they completed
-    hash_pw = bcrypt.hashpw(plain_text_password.encode(), bcrypt.gensalt())
-    cursor.execute(f"SELECT * FROM users WHERE username='{username}' AND password = '{hash_pw}';") #getting the username from database that matches the username
-    result = cursor.fetchall()
+    cursor.execute("SELECT * FROM users WHERE username=%s;", [username])
+    result = cursor.fetchone()
+ 
+    pw_hash = result[2] # Get the saved PW from the DB
+    password = request.form.get("password").encode('utf-8') # Get their PW attempt from the form
+ 
     connection.close()
-    if len(result):
-        session["user_id"] = result[0][0] 
-        session["username"] = result[0][1] #if they match we are setting user_id and username
-
-        return redirect(url_for('index')) #Redirect to login page with success muessage
-    
+ 
+    if bcrypt.check_password_hash(pw_hash, password):
+        session["user_id"] = result[0]
+        session["username"] = result[1]
+ 
+        return redirect(url_for('login_error', notification="loggedin")) # NEW: Redirect to login page with success muessage
+ 
     else:
-        return redirect(url_for('login_error', notification="error")) # NEW: Redirect to login page with fail message (this one shouldn't ever happen)
+        return redirect(url_for('login_error', notification="badlogin")) # NEW: Redirect to login page with fail message (this one shouldn't ever happen)
 
 @app.route("/api/signup", methods=["POST"])
 def signup_action():
@@ -123,8 +129,7 @@ def signup_action():
     cursor = connection.cursor()
     sign_name = request.form.get("username")
     sign_pw = request.form.get("password")
-    hash_pw = bcrypt.hashpw(sign_pw.encode(), bcrypt.gensalt())
-    print(hash_pw)
+    hash_pw = bcrypt.generate_password_hash(sign_pw).decode('utf-8')
     cursor.execute("INSERT INTO users(username, password) VALUES(%s, %s);", [sign_name, hash_pw])
     connection.commit()
     connection.close()
